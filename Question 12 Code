@@ -1,0 +1,50 @@
+
+import NetworkXNoPath as nx
+
+people_data = {
+    "person1": ["hindi", "english", "gujarati"],
+    "person2": ["hindi", "odia"],
+    "person3": ["tamil", "english"],
+    "person4": ["odia", "spanish"],
+    "person5": ["gujarati", "tamil"],
+    "person6": ["tamil", "odia"],
+    "person7": ["telugu", "english"],
+    "person8": ["telugu", "hindi"],
+    "person9": ["marathi", "hindi"],
+    "person10": ["english", "spanish"],
+}
+
+G = nx.Graph()
+
+
+for person, languages in people_data.items():
+    G.add_node(person)
+    for lang in languages:
+        for other_person, other_languages in people_data.items():
+            if lang in other_languages and person != other_person:
+                G.add_edge(person, other_person)
+
+
+def find_translation_path(person1, person2):
+    try:
+        path = nx.shortest_path(G, source=person1, target=person2)
+        translation_required = set()
+        for person in path:
+            translation_required.update(people_data[person])
+        translation_required.discard(person1)  
+        return list(path), list(translation_required)
+    except nx.NetworkXNoPath:
+        return None
+
+
+person1 = "person1"
+person4 = "person4"
+path, translation_required = find_translation_path(person1, person4)
+
+if path:
+    print(f"Shortest path from {person1} to {person4}: {path}")
+    print(f"Languages to be translated: {translation_required}")
+else:
+    print(f"No path found from {person1} to {person4}")
+
+
